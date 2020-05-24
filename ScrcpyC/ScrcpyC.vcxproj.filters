@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\android\input.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\android\keycodes.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\buffer_util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\cbuf.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\lock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\log.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\net.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\queue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\str_util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cli.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\command.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\compat.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\control_msg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\controller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\decoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\device.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\device_msg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event_converter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\events.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\file_handler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fps_counter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input_manager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\opengl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\receiver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\recorder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scrcpy.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\screen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\server.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tiny_xpm.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\video_buffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\unistd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\getopt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\stdalign.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\stdatomic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\threads.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\util\net.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\str_util.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cli.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\command.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\control_msg.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\controller.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\decoder.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\device.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\device_msg.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event_converter.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\file_handler.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fps_counter.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_manager.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opengl.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\receiver.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\recorder.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scrcpy.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\screen.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\server.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tiny_xpm.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\video_buffer.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\stdatomic.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
