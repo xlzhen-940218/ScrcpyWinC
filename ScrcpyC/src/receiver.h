@@ -5,7 +5,7 @@
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
 
-#include "config.h"
+#include "util/config.h"
 #include "util/net.h"
 
 // receive events from the device

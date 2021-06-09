@@ -1,6 +1,6 @@
 #include "event_converter.h"
 
-#include "config.h"
+#include "util/config.h"
 
 #define MAP(FROM, TO) case FROM: *to = TO; return true
 #define FAIL default: return false
@@ -16,7 +16,7 @@ convert_keycode_action(SDL_EventType from, enum android_keyevent_action *to) {
 
 static enum android_metastate
 autocomplete_metastate(enum android_metastate metastate) {
-    // fill dependant flags
+    // fill dependent flags
     if (metastate & (AMETA_SHIFT_LEFT_ON | AMETA_SHIFT_RIGHT_ON)) {
         metastate |= AMETA_SHIFT_ON;
     }
@@ -92,6 +92,10 @@ convert_keycode(SDL_Keycode from, enum android_keycode *to, uint16_t mod,
         MAP(SDLK_LEFT,         AKEYCODE_DPAD_LEFT);
         MAP(SDLK_DOWN,         AKEYCODE_DPAD_DOWN);
         MAP(SDLK_UP,           AKEYCODE_DPAD_UP);
+        MAP(SDLK_LCTRL,        AKEYCODE_CTRL_LEFT);
+        MAP(SDLK_RCTRL,        AKEYCODE_CTRL_RIGHT);
+        MAP(SDLK_LSHIFT,       AKEYCODE_SHIFT_LEFT);
+        MAP(SDLK_RSHIFT,       AKEYCODE_SHIFT_RIGHT);
     }
 
     if (!(mod & (KMOD_NUM | KMOD_SHIFT))) {
@@ -111,8 +115,8 @@ convert_keycode(SDL_Keycode from, enum android_keycode *to, uint16_t mod,
         }
     }
 
-    if (prefer_text) {
-        // do not forward alpha and space key events
+    if (prefer_text && !(mod & KMOD_CTRL)) {
+        // do not forward alpha and space key events (unless Ctrl is pressed)
         return false;
     }
 

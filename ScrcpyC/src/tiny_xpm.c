@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "config.h"
+#include "util/config.h"
 #include "util/log.h"
 
 struct index {
@@ -60,7 +60,7 @@ read_xpm(char *xpm[]) {
     (void) chars;
 
     // init index
-    struct index *index=malloc(colors);
+    struct index* index=malloc(colors);
     for (int i = 0; i < colors; ++i) {
         const char *line = xpm[1+i];
         index[i].c = line[0];

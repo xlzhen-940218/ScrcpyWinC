@@ -7,14 +7,13 @@
 #include <SDL_atomic.h>
 #include <SDL_thread.h>
 
-#include "config.h"
+#include "util/config.h"
 #include "util/net.h"
 
 struct video_buffer;
 
 struct stream {
     socket_t socket;
-    struct video_buffer *video_buffer;
     SDL_Thread *thread;
     struct decoder *decoder;
     struct recorder *recorder;

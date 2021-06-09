@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <SDL_mutex.h>
 
-#include "../config.h"
+#include "util/config.h"
 #include "log.h"
 
 static inline void

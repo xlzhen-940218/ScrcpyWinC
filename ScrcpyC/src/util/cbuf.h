@@ -3,9 +3,9 @@
 #define CBUF_H
 
 #include <stdbool.h>
-#include "../unistd.h"
+#include "unistd.h"
 
-#include "../config.h"
+#include "util/config.h"
 
 // To define a circular buffer type of 20 ints:
 //     struct cbuf_int CBUF(int, 20);

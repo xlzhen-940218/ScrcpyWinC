@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <SDL_platform.h>
 
-#include "../config.h"
+#include "config.h"
 #include "log.h"
+#pragma comment(lib, "Ws2_32.lib")
 
 #ifdef __WINDOWS__
   typedef int socklen_t;
-  typedef int ssize_t;
 #else
 # include <sys/types.h>
 # include <sys/socket.h>

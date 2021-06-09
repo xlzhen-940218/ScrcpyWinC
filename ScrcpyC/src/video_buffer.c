@@ -5,7 +5,7 @@
 #include <libavutil/avutil.h>
 #include <libavformat/avformat.h>
 
-#include "config.h"
+#include "util/config.h"
 #include "util/lock.h"
 #include "util/log.h"
 

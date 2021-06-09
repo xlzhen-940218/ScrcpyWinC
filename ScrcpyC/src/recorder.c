@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <libavutil/time.h>
 
-#include "config.h"
+#include "util/config.h"
 #include "compat.h"
 #include "util/lock.h"
 #include "util/log.h"
@@ -50,14 +50,16 @@ record_packet_delete(struct record_packet *rec) {
     av_packet_unref(&rec->packet);
     SDL_free(rec);
 }
-
+void queue_take_fix(struct recorder_queue* queue, struct record_packet* rec) {
+    assert(!queue_is_empty(queue));
+    *(&rec) = (queue)->first;
+    (queue)->first = (queue)->first->next;
+}
 static void
 recorder_queue_clear(struct recorder_queue *queue) {
     while (!queue_is_empty(queue)) {
         struct record_packet *rec;
-        assert(!queue_is_empty(queue));
-        *(&rec) = (queue)->first;
-        (queue)->first = (queue)->first->next;
+        queue_take_fix(queue, &rec);
         record_packet_delete(rec);
     }
 }
@@ -65,7 +67,7 @@ recorder_queue_clear(struct recorder_queue *queue) {
 bool
 recorder_init(struct recorder *recorder,
               const char *filename,
-              enum recorder_format format,
+              enum sc_record_format format,
               struct size declared_frame_size) {
     recorder->filename = SDL_strdup(filename);
     if (!recorder->filename) {
@@ -107,10 +109,10 @@ recorder_destroy(struct recorder *recorder) {
 }
 
 static const char *
-recorder_get_format_name(enum recorder_format format) {
+recorder_get_format_name(enum sc_record_format format) {
     switch (format) {
-        case RECORDER_FORMAT_MP4: return "mp4";
-        case RECORDER_FORMAT_MKV: return "matroska";
+        case SC_RECORD_FORMAT_MP4: return "mp4";
+        case SC_RECORD_FORMAT_MKV: return "matroska";
         default: return NULL;
     }
 }
@@ -257,6 +259,8 @@ recorder_write(struct recorder *recorder, AVPacket *packet) {
     return av_write_frame(recorder->ctx, packet) >= 0;
 }
 
+
+
 static int
 run_recorder(void *data) {
     struct recorder *recorder = data;
@@ -290,9 +294,7 @@ run_recorder(void *data) {
         }
 
         struct record_packet *rec;
-        assert(!queue_is_empty(&recorder->queue));
-        *(&rec) = (&recorder->queue)->first;
-        (&recorder->queue)->first = (&recorder->queue)->first->next;
+        queue_take_fix(&recorder->queue, &rec);
 
         mutex_unlock(recorder->mutex);
 
@@ -357,7 +359,18 @@ void
 recorder_join(struct recorder *recorder) {
     SDL_WaitThread(recorder->thread, NULL);
 }
-
+void queue_push_fix(struct recorder_queue* queue, struct record_packet* rec) {
+    (rec)->next = NULL;
+        if (queue_is_empty(queue)) {
+            
+                (queue)->first = (queue)->last = (rec);
+        }
+        else {
+            
+                (queue)->last->next = (rec);
+                (queue)->last = (rec);
+        }
+}
 bool
 recorder_push(struct recorder *recorder, const AVPacket *packet) {
     mutex_lock(recorder->mutex);
@@ -365,22 +378,18 @@ recorder_push(struct recorder *recorder, const AVPacket *packet) {
 
     if (recorder->failed) {
         // reject any new packet (this will stop the stream)
+        mutex_unlock(recorder->mutex);
         return false;
     }
 
     struct record_packet *rec = record_packet_new(packet);
     if (!rec) {
         LOGC("Could not allocate record packet");
+        mutex_unlock(recorder->mutex);
         return false;
     }
-    (rec)->next = NULL;
-    if (queue_is_empty(&recorder->queue)) {
-       (&recorder->queue)->first = (&recorder->queue)->last = (rec);
-    }
-    else {
-       (&recorder->queue)->last->next = (rec);
-       (&recorder->queue)->last = (rec);
-    }
+
+    queue_push_fix(&recorder->queue, rec);
     cond_signal(recorder->queue_cond);
 
     mutex_unlock(recorder->mutex);

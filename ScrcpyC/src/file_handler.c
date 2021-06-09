@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "config.h"
+#include "util/config.h"
 #include "command.h"
 #include "util/lock.h"
 #include "util/log.h"
@@ -53,6 +53,28 @@ file_handler_init(struct file_handler *file_handler, const char *serial,
     return true;
 }
 
+bool file_cbuf_take_fix(struct file_handler_request_queue* queue
+    , struct file_handler_request* msg) {
+    bool ok = !cbuf_is_empty(queue);
+    if (ok) {
+
+        *(msg) = (queue)->data[(queue)->tail];
+        (queue)->tail = ((queue)->tail + 1) % cbuf_size_(queue);
+    }
+    return ok;
+}
+
+bool file_cbuf_push_fix(struct file_handler_request_queue* queue
+    , struct file_handler_request* msg) {
+    bool ok = !cbuf_is_full(queue);
+    if (ok) {
+
+        (queue)->data[(queue)->head] = (*msg);
+        (queue)->head = ((queue)->head + 1) % cbuf_size_(queue);
+    }
+    return	ok;
+}
+
 void
 file_handler_destroy(struct file_handler *file_handler) {
     SDL_DestroyCond(file_handler->event_cond);
@@ -60,14 +82,7 @@ file_handler_destroy(struct file_handler *file_handler) {
     SDL_free(file_handler->serial);
 
     struct file_handler_request req;
-    bool ok = true;
-       
-    while (ok) {
-        ok=!cbuf_is_empty(&file_handler->queue);
-        if (ok) {
-            *(&req) = (&file_handler->queue)->data[(&file_handler->queue)->tail];
-            (&file_handler->queue)->tail = ((&file_handler->queue)->tail + 1) % cbuf_size_(&file_handler->queue);
-        }
+    while (file_cbuf_take_fix(&file_handler->queue, &req)) {
         file_handler_request_destroy(&req);
     }
 }
@@ -102,11 +117,7 @@ file_handler_request(struct file_handler *file_handler,
 
     mutex_lock(file_handler->mutex);
     bool was_empty = cbuf_is_empty(&file_handler->queue);
-    bool res = !cbuf_is_full(&file_handler->queue); 
-        if (res) {
-            (&file_handler->queue)->data[(&file_handler->queue)->head] = (req); 
-            (&file_handler->queue)->head = ((&file_handler->queue)->head + 1) % cbuf_size_(&file_handler->queue); 
-        } 
+    bool res = file_cbuf_push_fix(&file_handler->queue, &req);
     if (was_empty) {
         cond_signal(file_handler->event_cond);
     }
@@ -130,11 +141,7 @@ run_file_handler(void *data) {
             break;
         }
         struct file_handler_request req;
-        bool non_empty = !cbuf_is_empty(&file_handler->queue);
-        if (non_empty) {
-            *(&req) = (&file_handler->queue)->data[(&file_handler->queue)->tail];
-            (&file_handler->queue)->tail = ((&file_handler->queue)->tail + 1) % cbuf_size_(&file_handler->queue);
-        }
+        bool non_empty = file_cbuf_take_fix(&file_handler->queue, &req);
         assert(non_empty);
         (void) non_empty;
 

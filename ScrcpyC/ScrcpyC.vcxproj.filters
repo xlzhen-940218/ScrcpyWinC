@@ -3,7 +3,7 @@
   <ItemGroup>
     <Filter Include="源文件">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="头文件">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
@@ -120,13 +120,13 @@
     <ClInclude Include="src\getopt.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\util\stdalign.h">
+    <ClInclude Include="src\util\config.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\util\stdatomic.h">
+    <ClInclude Include="src\_mingw.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\util\threads.h">
+    <ClInclude Include="src\stdatomic.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -200,7 +200,7 @@
     <ClCompile Include="src\video_buffer.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\util\stdatomic.c">
+    <ClCompile Include="src\stdatomic.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

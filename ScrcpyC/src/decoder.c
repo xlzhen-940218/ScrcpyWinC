@@ -7,7 +7,7 @@
 #include <SDL_thread.h>
 #include "unistd.h"
 
-#include "config.h"
+#include "util/config.h"
 #include "compat.h"
 #include "events.h"
 #include "recorder.h"

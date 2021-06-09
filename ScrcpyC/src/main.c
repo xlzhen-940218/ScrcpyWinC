@@ -1,12 +1,13 @@
 #include "scrcpy.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include "unistd.h"
 #include <libavformat/avformat.h>
 #define SDL_MAIN_HANDLED // avoid link error on Linux Windows Subsystem
-#include <SDL.h>
+#include "SDL.h"
 
-#include "config.h"
+#include "util/config.h"
 #include "cli.h"
 #include "compat.h"
 #include "util/log.h"
@@ -29,17 +30,31 @@ print_version(void) {
                                                LIBAVUTIL_VERSION_MICRO);
 }
 
+static SDL_LogPriority
+convert_log_level_to_sdl(enum sc_log_level level) {
+    switch (level) {
+        case SC_LOG_LEVEL_DEBUG:
+            return SDL_LOG_PRIORITY_DEBUG;
+        case SC_LOG_LEVEL_INFO:
+            return SDL_LOG_PRIORITY_INFO;
+        case SC_LOG_LEVEL_WARN:
+            return SDL_LOG_PRIORITY_WARN;
+        case SC_LOG_LEVEL_ERROR:
+            return SDL_LOG_PRIORITY_ERROR;
+        default:
+            assert(!"unexpected log level");
+            return SDL_LOG_PRIORITY_INFO;
+    }
+}
+
+
 int
 main(int argc, char *argv[]) {
 #ifdef __WINDOWS__
     // disable buffering, we want logs immediately
     // even line buffering (setvbuf() with mode _IOLBF) is not sufficient
-    setvbuf(stdout, NULL, _IONBF,0);
-    setvbuf(stderr, NULL, _IONBF,0);
-#endif
-
-#ifndef NDEBUG
-    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_DEBUG);
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
 #endif
 
     struct scrcpy_cli_args args = {
@@ -48,9 +63,16 @@ main(int argc, char *argv[]) {
         .version = false,
     };
 
+#ifndef NDEBUG
+    args.opts.log_level = SC_LOG_LEVEL_DEBUG;
+#endif
+
     if (!scrcpy_parse_args(&args, argc, argv)) {
         return 1;
     }
+
+    SDL_LogPriority sdl_log = convert_log_level_to_sdl(args.opts.log_level);
+    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, sdl_log);
 
     if (args.help) {
         scrcpy_print_usage(argv[0]);
@@ -71,19 +93,10 @@ main(int argc, char *argv[]) {
     if (avformat_network_init()) {
         return 1;
     }
-    /*args.opts.serial = "192.168.1.36:5555";
-    args.opts.bit_rate = 1024 * 1024 * 2;
-    args.opts.max_fps = 24;
-    args.opts.max_size = 800;*/
+
     int res = scrcpy(&args.opts) ? 0 : 1;
 
     avformat_network_deinit(); // ignore failure
 
-#if defined (__WINDOWS__) && ! defined (WINDOWS_NOCONSOLE)
-    if (res != 0) {
-        fprintf(stderr, "Press any key to continue...\n");
-        getchar();
-    }
-#endif
     return res;
 }

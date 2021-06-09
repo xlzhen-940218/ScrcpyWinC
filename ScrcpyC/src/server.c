@@ -3,22 +3,24 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+//#include <libgen.h>
 #include <stdio.h>
 #include <SDL_thread.h>
 #include <SDL_timer.h>
 #include <SDL_platform.h>
 
-#include "config.h"
+#include "util/config.h"
 #include "command.h"
+#include "util/lock.h"
 #include "util/log.h"
 #include "util/net.h"
 #include "util/str_util.h"
 
-#define SOCKET_NAME "imobie"
-#define SERVER_FILENAME "imobie-server"
+#define SOCKET_NAME "scrcpy"
+#define SERVER_FILENAME "scrcpy-server"
 
-#define DEFAULT_SERVER_PATH PREFIX "/share/imobie/" SERVER_FILENAME
-#define DEVICE_SERVER_PATH "/data/local/tmp/imobie-server.jar"
+#define DEFAULT_SERVER_PATH PREFIX "/share/scrcpy/" SERVER_FILENAME
+#define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
 
 static char *
 get_server_path(void) {
@@ -61,16 +63,11 @@ get_server_path(void) {
         // not found, use current directory
         return SERVER_FILENAME;
     }
-
-    char* e = strrchr(executable_path, '\\');
-    if (!e) {
-        char* buf = strdup(executable_path);
-        return buf;
-    }
-    int index = (int)(e - executable_path);
-    char* dir = (char*)malloc(sizeof(char) * (index + 1));
-    strncpy(dir, executable_path, index);
-    dir[index] = '\0';
+    char* drive = malloc(0);
+    char* dir = malloc(0);
+    char* filename = malloc(0);
+    char* ext = malloc(0);
+    _splitpath(executable_path, drive,dir, filename, ext);
     size_t dirlen = strlen(dir);
 
     // sizeof(SERVER_FILENAME) gives statically the size including the null byte
@@ -151,7 +148,7 @@ listen_on_port(uint16_t port) {
 
 static bool
 enable_tunnel_reverse_any_port(struct server *server,
-                               struct port_range port_range) {
+                               struct sc_port_range port_range) {
     uint16_t port = port_range.first;
     for (;;) {
         if (!enable_tunnel_reverse(server->serial, port)) {
@@ -197,7 +194,7 @@ enable_tunnel_reverse_any_port(struct server *server,
 
 static bool
 enable_tunnel_forward_any_port(struct server *server,
-                               struct port_range port_range) {
+                               struct sc_port_range port_range) {
     server->tunnel_forward = true;
     uint16_t port = port_range.first;
     for (;;) {
@@ -209,7 +206,7 @@ enable_tunnel_forward_any_port(struct server *server,
 
         if (port < port_range.last) {
             LOGW("Could not forward port %" PRIu16", retrying on %" PRIu16,
-                 port, port + 1);
+                 port, (uint16_t) (port + 1));
             port++;
             continue;
         }
@@ -225,16 +222,38 @@ enable_tunnel_forward_any_port(struct server *server,
 }
 
 static bool
-enable_tunnel_any_port(struct server *server, struct port_range port_range) {
-    if (enable_tunnel_reverse_any_port(server, port_range)) {
-        return true;
+enable_tunnel_any_port(struct server *server, struct sc_port_range port_range,
+                       bool force_adb_forward) {
+    if (!force_adb_forward) {
+        // Attempt to use "adb reverse"
+        if (enable_tunnel_reverse_any_port(server, port_range)) {
+            return true;
+        }
+
+        // if "adb reverse" does not work (e.g. over "adb connect"), it
+        // fallbacks to "adb forward", so the app socket is the client
+
+        LOGW("'adb reverse' failed, fallback to 'adb forward'");
     }
 
-    // if "adb reverse" does not work (e.g. over "adb connect"), it fallbacks to
-    // "adb forward", so the app socket is the client
-
-    LOGW("'adb reverse' failed, fallback to 'adb forward'");
     return enable_tunnel_forward_any_port(server, port_range);
+}
+
+static const char *
+log_level_to_server_string(enum sc_log_level level) {
+    switch (level) {
+        case SC_LOG_LEVEL_DEBUG:
+            return "debug";
+        case SC_LOG_LEVEL_INFO:
+            return "info";
+        case SC_LOG_LEVEL_WARN:
+            return "warn";
+        case SC_LOG_LEVEL_ERROR:
+            return "error";
+        default:
+            assert(!"unexpected log level");
+            return "(unknown)";
+    }
 }
 
 static process_t
@@ -242,13 +261,13 @@ execute_server(struct server *server, const struct server_params *params) {
     char max_size_string[6];
     char bit_rate_string[11];
     char max_fps_string[6];
-    char lock_video_orientation_string[3];
+    char lock_video_orientation_string[5];
     char display_id_string[6];
-    sprintf_s(max_size_string, sizeof(max_size_string), "%"PRIu16, params->max_size);
-    sprintf_s(bit_rate_string,sizeof(bit_rate_string), "%"PRIu32, params->bit_rate);
-    sprintf_s(max_fps_string,sizeof(max_fps_string), "%"PRIu16, params->max_fps);
-    sprintf_s(lock_video_orientation_string,sizeof(lock_video_orientation_string), "%"PRIi8, params->lock_video_orientation);
-    sprintf_s(display_id_string,sizeof(display_id_string), "%"PRIu16, params->display_id);
+    sprintf(max_size_string, "%"PRIu16, params->max_size);
+    sprintf(bit_rate_string, "%"PRIu32, params->bit_rate);
+    sprintf(max_fps_string, "%"PRIu16, params->max_fps);
+    sprintf(lock_video_orientation_string, "%"PRIi8, params->lock_video_orientation);
+    sprintf(display_id_string, "%"PRIu16, params->display_id);
     const char *const cmd[] = {
         "shell",
         "CLASSPATH=" DEVICE_SERVER_PATH,
@@ -265,8 +284,9 @@ execute_server(struct server *server, const struct server_params *params) {
             SERVER_DEBUGGER_PORT,
 #endif
         "/", // unused
-        "com.android.imobie.Server",
+        "com.genymobile.scrcpy.Server",
         SCRCPY_VERSION,
+        log_level_to_server_string(params->log_level),
         max_size_string,
         bit_rate_string,
         max_fps_string,
@@ -276,6 +296,10 @@ execute_server(struct server *server, const struct server_params *params) {
         "true", // always send frame meta (packet boundaries + timestamp)
         params->control ? "true" : "false",
         display_id_string,
+        params->show_touches ? "true" : "false",
+        params->stay_awake ? "true" : "false",
+        params->codec_options ? params->codec_options : "-",
+        params->encoder_name ? params->encoder_name : "-",
     };
 #ifdef SERVER_DEBUGGER
     LOGI("Server debugger waiting for a client on device port "
@@ -334,15 +358,51 @@ close_socket(socket_t socket) {
     }
 }
 
-void
+bool
 server_init(struct server *server) {
-    *server = (struct server) SERVER_INITIALIZER;
+    server->serial = NULL;
+    server->process = PROCESS_NONE;
+    server->wait_server_thread = NULL;
+    atomic_flag_clear_explicit(&server->server_socket_closed,
+                               memory_order_relaxed);
+
+    server->mutex = SDL_CreateMutex();
+    if (!server->mutex) {
+        return false;
+    }
+
+    server->process_terminated_cond = SDL_CreateCond();
+    if (!server->process_terminated_cond) {
+        SDL_DestroyMutex(server->mutex);
+        return false;
+    }
+
+    server->process_terminated = false;
+
+    server->server_socket = INVALID_SOCKET;
+    server->video_socket = INVALID_SOCKET;
+    server->control_socket = INVALID_SOCKET;
+
+    server->port_range.first = 0;
+    server->port_range.last = 0;
+    server->local_port = 0;
+
+    server->tunnel_enabled = false;
+    server->tunnel_forward = false;
+
+    return true;
 }
 
 static int
 run_wait_server(void *data) {
     struct server *server = data;
     cmd_simple_wait(server->process, NULL); // ignore exit code
+
+    mutex_lock(server->mutex);
+    server->process_terminated = true;
+    cond_signal(server->process_terminated_cond);
+    mutex_unlock(server->mutex);
+
     // no need for synchronization, server_socket is initialized before this
     // thread was created
     if (server->server_socket != INVALID_SOCKET
@@ -371,7 +431,8 @@ server_start(struct server *server, const char *serial,
         goto error1;
     }
 
-    if (!enable_tunnel_any_port(server, params->port_range)) {
+    if (!enable_tunnel_any_port(server, params->port_range,
+                                params->force_adb_forward)) {
         goto error1;
     }
 
@@ -473,11 +534,31 @@ server_stop(struct server *server) {
 
     assert(server->process != PROCESS_NONE);
 
-    cmd_terminate(server->process);
-
     if (server->tunnel_enabled) {
         // ignore failure
         disable_tunnel(server);
+    }
+
+    // Give some delay for the server to terminate properly
+    mutex_lock(server->mutex);
+    int r = 0;
+    if (!server->process_terminated) {
+#define WATCHDOG_DELAY_MS 1000
+        r = cond_wait_timeout(server->process_terminated_cond,
+                              server->mutex,
+                              WATCHDOG_DELAY_MS);
+    }
+    mutex_unlock(server->mutex);
+
+    // After this delay, kill the server if it's not dead already.
+    // On some devices, closing the sockets is not sufficient to wake up the
+    // blocking calls while the device is asleep.
+    if (r == SDL_MUTEX_TIMEDOUT) {
+        // FIXME There is a race condition here: there is a small chance that
+        // the process is already terminated, and the PID assigned to a new
+        // process.
+        LOGW("Killing the server...");
+        cmd_terminate(server->process);
     }
 
     SDL_WaitThread(server->wait_server_thread, NULL);
@@ -486,4 +567,6 @@ server_stop(struct server *server) {
 void
 server_destroy(struct server *server) {
     SDL_free(server->serial);
+    SDL_DestroyCond(server->process_terminated_cond);
+    SDL_DestroyMutex(server->mutex);
 }

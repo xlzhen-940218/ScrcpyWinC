@@ -5,18 +5,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
+#include "util/config.h"
 #include "common.h"
 #include "util/log.h"
 #include "util/str_util.h"
-#include "unistd.h"
+
+
+#include <sys/stat.h>
+
+#include <WinSock2.h>
 
 static const char *adb_command;
 
 static inline const char *
 get_adb_command(void) {
     if (!adb_command) {
-        adb_command=getenv("ADB");
+        adb_command = getenv("ADB");
         if (!adb_command)
             adb_command = "adb";
     }
@@ -105,7 +109,7 @@ show_adb_err_msg(enum process_result err, const char *const argv[]) {
 
 process_t
 adb_execute(const char *serial, const char *const adb_cmd[], size_t len) {
-    const char **cmd= malloc(len + 4);
+    const char **cmd=malloc(len + 4);
     int i;
     process_t process;
     cmd[0] = get_adb_command();
@@ -132,7 +136,7 @@ adb_forward(const char *serial, uint16_t local_port,
             const char *device_socket_name) {
     char local[4 + 5 + 1]; // tcp:PORT
     char remote[108 + 14 + 1]; // localabstract:NAME
-    sprintf_s(local,sizeof(local), "tcp:%" PRIu16, local_port);
+    sprintf(local, "tcp:%" PRIu16, local_port);
     snprintf(remote, sizeof(remote), "localabstract:%s", device_socket_name);
     const char *const adb_cmd[] = {"forward", local, remote};
     return adb_execute(serial, adb_cmd, ARRAY_LEN(adb_cmd));
@@ -141,7 +145,7 @@ adb_forward(const char *serial, uint16_t local_port,
 process_t
 adb_forward_remove(const char *serial, uint16_t local_port) {
     char local[4 + 5 + 1]; // tcp:PORT
-    sprintf_s(local, sizeof(local), "tcp:%" PRIu16, local_port);
+    sprintf(local, "tcp:%" PRIu16, local_port);
     const char *const adb_cmd[] = {"forward", "--remove", local};
     return adb_execute(serial, adb_cmd, ARRAY_LEN(adb_cmd));
 }
@@ -151,7 +155,7 @@ adb_reverse(const char *serial, const char *device_socket_name,
             uint16_t local_port) {
     char local[4 + 5 + 1]; // tcp:PORT
     char remote[108 + 14 + 1]; // localabstract:NAME
-    sprintf_s(local, sizeof(local), "tcp:%" PRIu16, local_port);
+    sprintf(local, "tcp:%" PRIu16, local_port);
     snprintf(remote, sizeof(remote), "localabstract:%s", device_socket_name);
     const char *const adb_cmd[] = {"reverse", remote, local};
     return adb_execute(serial, adb_cmd, ARRAY_LEN(adb_cmd));
@@ -221,11 +225,12 @@ process_check_success(process_t proc, const char *name) {
     }
     exit_code_t exit_code;
     if (!cmd_simple_wait(proc, &exit_code)) {
-        if (exit_code != 0) {
+        LOGE("\"%s\" returned with value %" PRIexitcode, name, exit_code);
+        /*if (exit_code != -1u) {
             LOGE("\"%s\" returned with value %" PRIexitcode, name, exit_code);
         } else {
             LOGE("\"%s\" exited unexpectedly", name);
-        }
+        }*/
         return false;
     }
     return true;
@@ -263,13 +268,7 @@ enum process_result
         LOGC("Could not allocate wide char string");
         return PROCESS_ERROR_GENERIC;
     }
-
-#ifdef WINDOWS_NOCONSOLE
-    int flags = CREATE_NO_WINDOW;
-#else
-    int flags = 0;
-#endif
-    if (!CreateProcessW(NULL, wide, NULL, NULL, FALSE, flags, NULL, NULL, &si,
+    if (!CreateProcessW(NULL, wide, NULL, NULL, FALSE, 0, NULL, NULL, &si,
         &pi)) {
         SDL_free(wide);
         *handle = NULL;
@@ -286,7 +285,7 @@ enum process_result
 
 bool
 cmd_terminate(HANDLE handle) {
-    return TerminateProcess(handle, 1) && CloseHandle(handle);
+    return TerminateProcess(handle, 1);
 }
 
 bool
@@ -300,6 +299,7 @@ cmd_simple_wait(HANDLE handle, DWORD* exit_code) {
     if (exit_code) {
         *exit_code = code;
     }
+    CloseHandle(handle);
     return !code;
 }
 

@@ -2,7 +2,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include <SDL.h>
+#include "SDL.h"
 
 void
 sc_opengl_init(struct sc_opengl *gl) {
@@ -31,7 +31,7 @@ sc_opengl_init(struct sc_opengl *gl) {
         version += sizeof(PREFIX) - 1;
     }
 
-    int r = sscanf_s(version, "%d.%d", &gl->version_major, &gl->version_minor);
+    int r = sscanf(version, "%d.%d", &gl->version_major, &gl->version_minor);
     if (r != 2) {
         // failed to parse the version
         gl->version_major = 0;

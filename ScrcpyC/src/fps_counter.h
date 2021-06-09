@@ -1,13 +1,13 @@
 #ifndef FPSCOUNTER_H
 #define FPSCOUNTER_H
 
-#include "util/stdatomic.h"
+#include "stdatomic.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <SDL_mutex.h>
 #include <SDL_thread.h>
 
-#include "config.h"
+#include "util/config.h"
 
 struct fps_counter {
     SDL_Thread *thread;

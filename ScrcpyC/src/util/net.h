@@ -11,15 +11,13 @@
   #define SHUT_WR SD_SEND
   #define SHUT_RDWR SD_BOTH
   typedef SOCKET socket_t;
-  typedef int ssize_t;
 #else
 # include <sys/socket.h>
 # define INVALID_SOCKET -1
   typedef int socket_t;
-  typedef int ssize_t;
 #endif
 
-#include "../config.h"
+#include "config.h"
 
 bool
 net_init(void);

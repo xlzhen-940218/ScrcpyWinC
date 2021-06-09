@@ -8,7 +8,7 @@
 #include <SDL_thread.h>
 #include "unistd.h"
 
-#include "config.h"
+#include "util/config.h"
 #include "compat.h"
 #include "decoder.h"
 #include "events.h"
@@ -56,8 +56,8 @@ stream_recv_packet(struct stream *stream, AVPacket *packet) {
         av_packet_unref(packet);
         return false;
     }
-    uint64_t no_pts = -1;
-    packet->pts = pts != no_pts ? (int64_t) pts : AV_NOPTS_VALUE;
+
+    packet->pts = pts != /*NO_PTS*/-1 ? (int64_t) pts : AV_NOPTS_VALUE;
 
     return true;
 }

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../config.h"
+#include "util/config.h"
 
 static inline void
 buffer_write16be(uint8_t *buf, uint16_t value) {

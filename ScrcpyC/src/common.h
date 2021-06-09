@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "config.h"
+#include "util/config.h"
 
 #define ARRAY_LEN(a) (sizeof(a) / sizeof(a[0]))
 #define MIN(X,Y) (X) < (Y) ? (X) : (Y)
