@@ -148,12 +148,12 @@ int32_t zenny_atomic_fetch_or32(volatile atomic_long* object, int32_t operand)
 {
     return _InterlockedOr(object, operand);
 }
-
-//int64_t zenny_atomic_fetch_or64(volatile atomic_llong* object, int64_t operand)
-//{
-//    return _InterlockedOr64(object, operand);
-//}
-
+#ifndef __WIN32__
+int64_t zenny_atomic_fetch_or64(volatile atomic_llong* object, int64_t operand)
+{
+    return _InterlockedOr64(object, operand);
+}
+#endif
 
 int8_t zenny_atomic_fetch_xor8(volatile atomic_schar* object, int8_t operand)
 {
@@ -169,11 +169,12 @@ int32_t zenny_atomic_fetch_xor32(volatile atomic_long* object, int32_t operand)
 {
     return _InterlockedXor(object, operand);
 }
-
-//int64_t zenny_atomic_fetch_xor64(volatile atomic_llong* object, int64_t operand)
-//{
-//    return _InterlockedXor64(object, operand);
-//}
+#ifndef __WIN32__
+int64_t zenny_atomic_fetch_xor64(volatile atomic_llong* object, int64_t operand)
+{
+    return _InterlockedXor64(object, operand);
+}
+#endif
 
 int8_t zenny_atomic_fetch_and8(volatile atomic_schar* object, int8_t operand)
 {
@@ -189,11 +190,12 @@ int32_t zenny_atomic_fetch_and32(volatile atomic_long* object, int32_t operand)
 {
     return _InterlockedAnd(object, operand);
 }
-
-//int64_t zenny_atomic_fetch_and64(volatile atomic_llong* object, int64_t operand)
-//{
-//    return _InterlockedAnd64(object, operand);
-//}
+#ifndef __WIN32__
+int64_t zenny_atomic_fetch_and64(volatile atomic_llong* object, int64_t operand)
+{
+    return _InterlockedAnd64(object, operand);
+}
+#endif
 
 int8_t zenny_atomic_exchange8(volatile atomic_schar* object, int8_t desired)
 {
@@ -209,11 +211,12 @@ int32_t zenny_atomic_exchange32(volatile atomic_long* object, int32_t desired)
 {
     return _InterlockedExchange(object, desired);
 }
-
-//int64_t zenny_atomic_exchange64(volatile atomic_llong* object, int64_t desired)
-//{
-//    return _InterlockedExchange64(object, desired);
-//}
+#ifndef __WIN32__
+int64_t zenny_atomic_exchange64(volatile atomic_llong* object, int64_t desired)
+{
+    return _InterlockedExchange64(object, desired);
+}
+#endif
 
 bool zenny_atomic_compare_exchange8(volatile atomic_schar* object, int8_t* expected, int8_t desired)
 {

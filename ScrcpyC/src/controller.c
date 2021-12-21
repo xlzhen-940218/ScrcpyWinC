@@ -2,160 +2,163 @@
 
 #include <assert.h>
 
-#include "util/config.h"
-#include "util/lock.h"
 #include "util/log.h"
 
 bool
-controller_init(struct controller* controller, socket_t control_socket) {
-	cbuf_init(&controller->queue);
+controller_init(struct controller *controller, sc_socket control_socket,
+                struct sc_acksync *acksync) {
+    cbuf_init(&controller->queue);
 
-	if (!receiver_init(&controller->receiver, control_socket)) {
-		return false;
-	}
+    bool ok = receiver_init(&controller->receiver, control_socket, acksync);
+    if (!ok) {
+        return false;
+    }
 
-	if (!(controller->mutex = SDL_CreateMutex())) {
-		receiver_destroy(&controller->receiver);
-		return false;
-	}
+    ok = sc_mutex_init(&controller->mutex);
+    if (!ok) {
+        receiver_destroy(&controller->receiver);
+        return false;
+    }
 
-	if (!(controller->msg_cond = SDL_CreateCond())) {
-		receiver_destroy(&controller->receiver);
-		SDL_DestroyMutex(controller->mutex);
-		return false;
-	}
+    ok = sc_cond_init(&controller->msg_cond);
+    if (!ok) {
+        receiver_destroy(&controller->receiver);
+        sc_mutex_destroy(&controller->mutex);
+        return false;
+    }
 
-	controller->control_socket = control_socket;
-	controller->stopped = false;
+    controller->control_socket = control_socket;
+    controller->stopped = false;
 
-	return true;
-}
-
-bool controller_cbuf_take_fix(struct control_msg_queue* queue
-	, struct control_msg* msg) {
-	bool ok = !cbuf_is_empty(queue);
-	if (ok) {
-
-		*(msg) = (queue)->data[(queue)->tail];
-		(queue)->tail = ((queue)->tail + 1) % cbuf_size_(queue);
-	}
-	return ok;
-}
-
-bool controller_cbuf_push_fix(struct control_msg_queue* queue
-	, struct control_msg* msg) {
-	bool ok = !cbuf_is_full(queue);
-	if (ok) {
-
-		(queue)->data[(queue)->head] = (*msg);
-		(queue)->head = ((queue)->head + 1) % cbuf_size_(queue);
-	}
-	return	ok;
+    return true;
 }
 
 void
-controller_destroy(struct controller* controller) {
-	SDL_DestroyCond(controller->msg_cond);
-	SDL_DestroyMutex(controller->mutex);
+controller_destroy(struct controller *controller) {
+    sc_cond_destroy(&controller->msg_cond);
+    sc_mutex_destroy(&controller->mutex);
 
-	struct control_msg msg;
+    struct control_msg msg;
+    bool ok = true;
+    while (true) { //cbuf_take(); 
+        ok = !cbuf_is_empty(&controller->queue);
+        if (ok) {
+            *(&msg) = (&controller->queue)->data[(&controller->queue)->tail];
+            (&controller->queue)->tail = ((&controller->queue)->tail + 1) % cbuf_size_(&controller->queue);
+            control_msg_destroy(&msg);
+            break;
+        }
+       
+    }
 
-	while (controller_cbuf_take_fix(&controller->queue, &msg)) {
-		control_msg_destroy(&msg);
-	}
-
-	receiver_destroy(&controller->receiver);
+    receiver_destroy(&controller->receiver);
 }
-
-
 
 bool
-controller_push_msg(struct controller* controller,
-	const struct control_msg* msg) {
-	mutex_lock(controller->mutex);
-	bool was_empty = cbuf_is_empty(&controller->queue);
-	bool res = controller_cbuf_push_fix(&controller->queue, msg);
-	if (was_empty) {
-		cond_signal(controller->msg_cond);
-	}
-	mutex_unlock(controller->mutex);
-	return res;
+controller_push_msg(struct controller *controller,
+                    const struct control_msg *msg) {
+    if (sc_get_log_level() <= SC_LOG_LEVEL_VERBOSE) {
+        control_msg_log(msg);
+    }
+
+    sc_mutex_lock(&controller->mutex);
+    bool was_empty = cbuf_is_empty(&controller->queue);
+    //bool res = cbuf_push(&controller->queue, *msg);
+    bool res = !cbuf_is_full(&controller->queue);
+    if (res) {
+        (&controller->queue)->data[(&controller->queue)->head] = (*msg);
+        (&controller->queue)->head = ((&controller->queue)->head + 1) % cbuf_size_(&controller->queue);
+    }
+
+    if (was_empty) {
+        sc_cond_signal(&controller->msg_cond);
+    }
+    sc_mutex_unlock(&controller->mutex);
+    return res;
 }
 
-
-
 static bool
-process_msg(struct controller* controller,
-	const struct control_msg* msg) {
-	static unsigned char serialized_msg[CONTROL_MSG_MAX_SIZE];
-	int length = control_msg_serialize(msg, serialized_msg);
-	if (!length) {
-		return false;
-	}
-	int w = net_send_all(controller->control_socket, serialized_msg, length);
-	return w == length;
+process_msg(struct controller *controller, const struct control_msg *msg) {
+    static unsigned char serialized_msg[CONTROL_MSG_MAX_SIZE];
+    size_t length = control_msg_serialize(msg, serialized_msg);
+    if (!length) {
+        return false;
+    }
+    ssize_t w =
+        net_send_all(controller->control_socket, serialized_msg, length);
+    return (size_t) w == length;
 }
 
 static int
-run_controller(void* data) {
-	struct controller* controller = data;
+run_controller(void *data) {
+    struct controller *controller = data;
 
-	for (;;) {
-		mutex_lock(controller->mutex);
-		while (!controller->stopped && cbuf_is_empty(&controller->queue)) {
-			cond_wait(controller->msg_cond, controller->mutex);
-		}
-		if (controller->stopped) {
-			// stop immediately, do not process further msgs
-			mutex_unlock(controller->mutex);
-			break;
-		}
-		struct control_msg msg;
-		bool non_empty = controller_cbuf_take_fix(&controller->queue, &msg);
-		assert(non_empty);
-		(void)non_empty;
-		mutex_unlock(controller->mutex);
+    for (;;) {
+        sc_mutex_lock(&controller->mutex);
+        while (!controller->stopped && cbuf_is_empty(&controller->queue)) {
+            sc_cond_wait(&controller->msg_cond, &controller->mutex);
+        }
+        if (controller->stopped) {
+            // stop immediately, do not process further msgs
+            sc_mutex_unlock(&controller->mutex);
+            break;
+        }
+        struct control_msg msg;
+        bool non_empty = true;
+        while (true) { //cbuf_take(); 
+            non_empty = !cbuf_is_empty(&controller->queue);
+            if (non_empty) {
+                *(&msg) = (&controller->queue)->data[(&controller->queue)->tail];
+                (&controller->queue)->tail = ((&controller->queue)->tail + 1) % cbuf_size_(&controller->queue);
+                control_msg_destroy(&msg);
+                break;
+            }
+            
+        }
+        assert(non_empty);
+        (void) non_empty;
+        sc_mutex_unlock(&controller->mutex);
 
-		bool ok = process_msg(controller, &msg);
-		control_msg_destroy(&msg);
-		if (!ok) {
-			LOGD("Could not write msg to socket");
-			break;
-		}
-	}
-	return 0;
+        bool ok = process_msg(controller, &msg);
+        control_msg_destroy(&msg);
+        if (!ok) {
+            LOGD("Could not write msg to socket");
+            break;
+        }
+    }
+    return 0;
 }
 
 bool
-controller_start(struct controller* controller) {
-	LOGD("Starting controller thread");
+controller_start(struct controller *controller) {
+    LOGD("Starting controller thread");
 
-	controller->thread = SDL_CreateThread(run_controller, "controller",
-		controller);
-	if (!controller->thread) {
-		LOGC("Could not start controller thread");
-		return false;
-	}
+    bool ok = sc_thread_create(&controller->thread, run_controller,
+                               "controller", controller);
+    if (!ok) {
+        LOGC("Could not start controller thread");
+        return false;
+    }
 
-	if (!receiver_start(&controller->receiver)) {
-		controller_stop(controller);
-		SDL_WaitThread(controller->thread, NULL);
-		return false;
-	}
+    if (!receiver_start(&controller->receiver)) {
+        controller_stop(controller);
+        sc_thread_join(&controller->thread, NULL);
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 void
-controller_stop(struct controller* controller) {
-	mutex_lock(controller->mutex);
-	controller->stopped = true;
-	cond_signal(controller->msg_cond);
-	mutex_unlock(controller->mutex);
+controller_stop(struct controller *controller) {
+    sc_mutex_lock(&controller->mutex);
+    controller->stopped = true;
+    sc_cond_signal(&controller->msg_cond);
+    sc_mutex_unlock(&controller->mutex);
 }
 
 void
-controller_join(struct controller* controller) {
-	SDL_WaitThread(controller->thread, NULL);
-	receiver_join(&controller->receiver);
+controller_join(struct controller *controller) {
+    sc_thread_join(&controller->thread, NULL);
+    receiver_join(&controller->receiver);
 }

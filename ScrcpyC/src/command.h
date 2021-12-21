@@ -9,11 +9,14 @@
  // not needed here, but winsock2.h must never be included AFTER windows.h
 # include <winsock2.h>
 # include <windows.h>
-#define S_ISREG( m ) (((m) & S_IFMT) == S_IFREG)
 # define PATH_SEPARATOR '\\'
 # define PRIexitcode "lu"
 // <https://stackoverflow.com/a/44383330/1987178>
-# define PRIsizet "Iu"
+# ifdef _WIN64
+#   define PRIsizet PRIu64
+# else
+#   define PRIsizet PRIu32
+# endif
 # define PROCESS_NONE NULL
 # define NO_EXIT_CODE -1u // max value as unsigned
   typedef HANDLE process_t;
@@ -32,7 +35,7 @@
 
 #endif
 
-#include "util/config.h"
+#include "config.h"
 
 enum process_result {
     PROCESS_SUCCESS,
@@ -55,27 +58,27 @@ bool
 cmd_simple_wait(process_t pid, exit_code_t *exit_code);
 
 process_t
-adb_execute(const char *serial, const char *const adb_cmd[], size_t len);
+adb_execute_command(const char *serial, const char *const adb_cmd[], size_t len);
 
 process_t
-adb_forward(const char *serial, uint16_t local_port,
+adb_forward_command(const char *serial, uint16_t local_port,
             const char *device_socket_name);
 
 process_t
-adb_forward_remove(const char *serial, uint16_t local_port);
+adb_forward_remove_command(const char *serial, uint16_t local_port);
 
 process_t
-adb_reverse(const char *serial, const char *device_socket_name,
+adb_reverse_command(const char *serial, const char *device_socket_name,
             uint16_t local_port);
 
 process_t
-adb_reverse_remove(const char *serial, const char *device_socket_name);
+adb_reverse_remove_command(const char *serial, const char *device_socket_name);
 
 process_t
-adb_push(const char *serial, const char *local, const char *remote);
+adb_push_command(const char *serial, const char *local, const char *remote);
 
 process_t
-adb_install(const char *serial, const char *local);
+adb_install_command(const char *serial, const char *local);
 
 // convenience function to wait for a successful process execution
 // automatically log process errors with the provided process name

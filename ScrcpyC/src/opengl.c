@@ -2,7 +2,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "SDL.h"
+#include <SDL.h>
 
 void
 sc_opengl_init(struct sc_opengl *gl) {

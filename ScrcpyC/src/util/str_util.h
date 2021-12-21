@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "config.h"
+#include "../config.h"
 
 // like strncpy, except:
 //  - it copies at most n-1 chars
@@ -16,7 +16,7 @@ size_t
 xstrncpy(char *dest, const char *src, size_t n);
 
 // join tokens by sep into dst
-// returns the number of chars actually written (max n-1) if no truncation
+// returns the number of chars actually written (max n-1) if no trucation
 // occurred, or n if truncated
 size_t
 xstrjoin(char *dst, const char *const tokens[], char sep, size_t n);

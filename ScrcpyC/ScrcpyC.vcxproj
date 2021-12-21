@@ -19,25 +19,35 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\adb.h" />
+    <ClInclude Include="src\adb_parser.h" />
+    <ClInclude Include="src\adb_tunnel.h" />
     <ClInclude Include="src\android\input.h" />
     <ClInclude Include="src\android\keycodes.h" />
+    <ClInclude Include="src\asprintf.h" />
     <ClInclude Include="src\cli.h" />
+    <ClInclude Include="src\clock.h" />
     <ClInclude Include="src\command.h" />
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\compat.h" />
     <ClInclude Include="src\config.h" />
     <ClInclude Include="src\controller.h" />
     <ClInclude Include="src\control_msg.h" />
+    <ClInclude Include="src\coords.h" />
     <ClInclude Include="src\decoder.h" />
-    <ClInclude Include="src\device.h" />
     <ClInclude Include="src\device_msg.h" />
     <ClInclude Include="src\events.h" />
     <ClInclude Include="src\event_converter.h" />
     <ClInclude Include="src\file_handler.h" />
     <ClInclude Include="src\fps_counter.h" />
+    <ClInclude Include="src\frame_buffer.h" />
     <ClInclude Include="src\getopt.h" />
+    <ClInclude Include="src\icon.h" />
     <ClInclude Include="src\input_manager.h" />
+    <ClInclude Include="src\keyboard_inject.h" />
+    <ClInclude Include="src\mouse_inject.h" />
     <ClInclude Include="src\opengl.h" />
+    <ClInclude Include="src\options.h" />
     <ClInclude Include="src\receiver.h" />
     <ClInclude Include="src\recorder.h" />
     <ClInclude Include="src\scrcpy.h" />
@@ -45,33 +55,63 @@
     <ClInclude Include="src\server.h" />
     <ClInclude Include="src\stdatomic.h" />
     <ClInclude Include="src\stream.h" />
+    <ClInclude Include="src\tailor.h" />
     <ClInclude Include="src\tiny_xpm.h" />
+    <ClInclude Include="src\trait\frame_sink.h" />
+    <ClInclude Include="src\trait\key_processor.h" />
+    <ClInclude Include="src\trait\mouse_processor.h" />
+    <ClInclude Include="src\trait\packet_sink.h" />
     <ClInclude Include="src\unistd.h" />
+    <ClInclude Include="src\util\acksync.h" />
     <ClInclude Include="src\util\buffer_util.h" />
     <ClInclude Include="src\util\cbuf.h" />
     <ClInclude Include="src\util\config.h" />
+    <ClInclude Include="src\util\file.h" />
+    <ClInclude Include="src\util\intmap.h" />
+    <ClInclude Include="src\util\intr.h" />
     <ClInclude Include="src\util\lock.h" />
     <ClInclude Include="src\util\log.h" />
     <ClInclude Include="src\util\net.h" />
+    <ClInclude Include="src\util\net_intr.h" />
+    <ClInclude Include="src\util\process.h" />
+    <ClInclude Include="src\util\process_intr.h" />
     <ClInclude Include="src\util\queue.h" />
+    <ClInclude Include="src\util\stdalign.h" />
+    <ClInclude Include="src\util\stdatomic.h" />
+    <ClInclude Include="src\util\str.h" />
+    <ClInclude Include="src\util\strbuf.h" />
     <ClInclude Include="src\util\str_util.h" />
+    <ClInclude Include="src\util\term.h" />
+    <ClInclude Include="src\util\thread.h" />
+    <ClInclude Include="src\util\threads.h" />
+    <ClInclude Include="src\util\tick.h" />
+    <ClInclude Include="src\v4l2_sink.h" />
     <ClInclude Include="src\video_buffer.h" />
     <ClInclude Include="src\_mingw.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\adb.c" />
+    <ClCompile Include="src\adb_parser.c" />
+    <ClCompile Include="src\adb_tunnel.c" />
     <ClCompile Include="src\cli.c" />
+    <ClCompile Include="src\clock.c" />
     <ClCompile Include="src\command.c" />
+    <ClCompile Include="src\compat.c" />
     <ClCompile Include="src\controller.c" />
     <ClCompile Include="src\control_msg.c" />
     <ClCompile Include="src\decoder.c" />
-    <ClCompile Include="src\device.c" />
     <ClCompile Include="src\device_msg.c" />
-    <ClCompile Include="src\event_converter.c" />
     <ClCompile Include="src\file_handler.c" />
     <ClCompile Include="src\fps_counter.c" />
+    <ClCompile Include="src\frame_buffer.c" />
+    <ClCompile Include="src\getopt.c" />
+    <ClCompile Include="src\icon.c" />
     <ClCompile Include="src\input_manager.c" />
+    <ClCompile Include="src\keyboard_inject.c" />
     <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\mouse_inject.c" />
     <ClCompile Include="src\opengl.c" />
+    <ClCompile Include="src\options.c" />
     <ClCompile Include="src\receiver.c" />
     <ClCompile Include="src\recorder.c" />
     <ClCompile Include="src\scrcpy.c" />
@@ -79,9 +119,22 @@
     <ClCompile Include="src\server.c" />
     <ClCompile Include="src\stdatomic.c" />
     <ClCompile Include="src\stream.c" />
-    <ClCompile Include="src\tiny_xpm.c" />
+    <ClCompile Include="src\util\acksync.c" />
+    <ClCompile Include="src\util\file.c" />
+    <ClCompile Include="src\util\intmap.c" />
+    <ClCompile Include="src\util\intr.c" />
+    <ClCompile Include="src\util\log.c" />
     <ClCompile Include="src\util\net.c" />
+    <ClCompile Include="src\util\net_intr.c" />
+    <ClCompile Include="src\util\process.c" />
+    <ClCompile Include="src\util\process_intr.c" />
+    <ClCompile Include="src\util\str.c" />
+    <ClCompile Include="src\util\strbuf.c" />
     <ClCompile Include="src\util\str_util.c" />
+    <ClCompile Include="src\util\term.c" />
+    <ClCompile Include="src\util\thread.c" />
+    <ClCompile Include="src\util\tick.c" />
+    <ClCompile Include="src\v4l2_sink.c" />
     <ClCompile Include="src\video_buffer.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -151,17 +204,17 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\ffmpeg-4.3.1-win32-dev\include;.\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ffmpeg43_win32\include;.\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAsWinRT>false</CompileAsWinRT>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\ffmpeg-4.3.1-win32-dev\lib;.\SDL2-2.0.14\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>.\SDL2-2.0.14\lib\x86\SDL2.lib;.\ffmpeg-4.3.1-win32-dev\lib\avcodec.lib;.\ffmpeg-4.3.1-win32-dev\lib\avdevice.lib;.\ffmpeg-4.3.1-win32-dev\lib\avfilter.lib;.\ffmpeg-4.3.1-win32-dev\lib\avformat.lib;.\ffmpeg-4.3.1-win32-dev\lib\avutil.lib;.\ffmpeg-4.3.1-win32-dev\lib\postproc.lib;.\ffmpeg-4.3.1-win32-dev\lib\swresample.lib;.\ffmpeg-4.3.1-win32-dev\lib\swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\ffmpeg43_win32\lib;.\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>.\SDL2\lib\x86\SDL2.lib;.\ffmpeg43_win32\lib\avcodec.lib;.\ffmpeg43_win32\lib\avdevice.lib;.\ffmpeg43_win32\lib\avfilter.lib;.\ffmpeg43_win32\lib\avformat.lib;.\ffmpeg43_win32\lib\avutil.lib;.\ffmpeg43_win32\lib\postproc.lib;.\ffmpeg43_win32\lib\swresample.lib;.\ffmpeg43_win32\lib\swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -183,16 +236,17 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\ffmpeg-4.3.1-win64-dev\include;.\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ffmpeg43_win64\include;.\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\ffmpeg-4.3.1-win64-dev\lib;.\SDL2-2.0.14\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>.\SDL2-2.0.14\lib\x64\SDL2.lib;.\SDL2-2.0.14\lib\x64\SDL2main.lib;.\ffmpeg-4.3.1-win64-dev\lib\avcodec.lib;.\ffmpeg-4.3.1-win64-dev\lib\avdevice.lib;.\ffmpeg-4.3.1-win64-dev\lib\avfilter.lib;.\ffmpeg-4.3.1-win64-dev\lib\avformat.lib;.\ffmpeg-4.3.1-win64-dev\lib\avutil.lib;.\ffmpeg-4.3.1-win64-dev\lib\postproc.lib;.\ffmpeg-4.3.1-win64-dev\lib\swresample.lib;.\ffmpeg-4.3.1-win64-dev\lib\swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\ffmpeg43_win64\lib;.\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>.\SDL2\lib\x64\SDL2.lib;.\SDL2\lib\x64\SDL2main.lib;.\ffmpeg43_win64\lib\avcodec.lib;.\ffmpeg43_win64\lib\avdevice.lib;.\ffmpeg43_win64\lib\avfilter.lib;.\ffmpeg43_win64\lib\avformat.lib;.\ffmpeg43_win64\lib\avutil.lib;.\ffmpeg43_win64\lib\postproc.lib;.\ffmpeg43_win64\lib\swresample.lib;.\ffmpeg43_win64\lib\swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

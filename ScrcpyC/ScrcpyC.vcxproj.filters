@@ -63,9 +63,6 @@
     <ClInclude Include="src\decoder.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\device.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="src\device_msg.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -129,6 +126,102 @@
     <ClInclude Include="src\stdatomic.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="src\trait\frame_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\trait\key_processor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\trait\mouse_processor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\trait\packet_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\acksync.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\file.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\intmap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\intr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\net_intr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\process.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\process_intr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\stdalign.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\stdatomic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\str.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\strbuf.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\term.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\thread.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\threads.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\tick.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\adb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\adb_parser.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\adb_tunnel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asprintf.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\clock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\coords.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\frame_buffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\icon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\keyboard_inject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mouse_inject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\options.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tailor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\v4l2_sink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\util\net.c">
@@ -152,13 +245,7 @@
     <ClCompile Include="src\decoder.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\device.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\device_msg.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\event_converter.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\file_handler.c">
@@ -194,13 +281,85 @@
     <ClCompile Include="src\stream.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\tiny_xpm.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\video_buffer.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\stdatomic.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\acksync.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\file.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\intmap.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\intr.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\log.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\net_intr.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\process.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\process_intr.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\str.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\strbuf.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\term.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\thread.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\tick.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\adb.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\adb_parser.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\adb_tunnel.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\clock.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\compat.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\frame_buffer.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\getopt.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\icon.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\keyboard_inject.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mouse_inject.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\options.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\v4l2_sink.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

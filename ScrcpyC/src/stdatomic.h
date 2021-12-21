@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <uchar.h>
+#include <SDL_platform.h>
 
 #define ATOMIC_VAR_INIT(value)      (value)
 #define atomic_init(object, value)  (void)(*(object) = (value))

@@ -11,23 +11,31 @@
 
 #define DEFAULT_LOCAL_PORT_RANGE_LAST 27199
 
-#define DEFAULT_LOCK_VIDEO_ORIENTATION -1
+//#define HAVE_AOA_HID
 
-#define DEFAULT_MAX_SIZE 0
+#define HAVE_ASPRINTF
 
-#define HIDPI_SUPPORT
+//#define HAVE_SOCK_CLOEXEC
 
-#define NDEBUG
+#define HAVE_STRDUP
 
-#define PORTABLE
+#define HAVE_V4L2
+
+#define HAVE_VASPRINTF
+
+#undef PORTABLE
 
 #define PREFIX "/usr/local"
 
-#define SCRCPY_VERSION "1.13"
+#define SCRCPY_VERSION "1.21"
 
 #undef SERVER_DEBUGGER
 
 #define SERVER_DEBUGGER_METHOD_NEW
 
-#undef WINDOWS_NOCONSOLE
+#define _GNU_SOURCE
+
+#define _POSIX_C_SOURCE 200809L
+
+#define _XOPEN_SOURCE 700
 
