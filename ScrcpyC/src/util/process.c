@@ -4,6 +4,7 @@
 #include <tchar.h>
 //#include <libgen.h>
 #include "log.h"
+#include "str_util.h"
 
 typedef long ssize_t;
 #define CMD_MAX_LEN 8192
@@ -142,9 +143,9 @@ enum sc_process_result
         LOG_OOM();
         goto error_free_attribute_list;
     }
-    wchar_t* wide = malloc(strlen(cmd) + 1);
-    mbstowcs_s(NULL, wide, strlen(cmd) + 1, cmd, strlen(cmd));
-
+    /*wchar_t* wide = malloc(strlen(cmd) + 1);
+    mbstowcs_s(NULL, wide, strlen(cmd) + 1, cmd, strlen(cmd));*/
+    wchar_t *wide = utf8_to_wide_char(cmd);
     //wchar_t* wide = _tcsdup(cmd);
     free(cmd);
     if (!wide) {

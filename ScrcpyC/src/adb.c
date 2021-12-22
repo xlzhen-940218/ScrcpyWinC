@@ -454,11 +454,9 @@ adb_get_serialno(struct sc_intr* intr, unsigned flags) {
 	const char** devices = malloc(1);
 	int num = 0;
 	adb_devices(intr, flags, devices,&num);
-	for (int i = 0; i < num; i++)
-	{
-		LOGD(devices[i]);
-	}
-	char* device_id= (char*)strtok(devices[0], "\t");
+	
+	char* device_id= (char*)strtok(devices[0], "\t");//多个设备时取出第一个
+
 	const char* const adb_cmd[] = { "-s",device_id,"get-serialno" };
 
 	sc_pipe pout;

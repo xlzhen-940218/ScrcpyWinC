@@ -73,7 +73,12 @@ adb_disconnect(struct sc_intr *intr, const char *ip_port, unsigned flags);
 char *
 adb_getprop(struct sc_intr *intr, const char *serial, const char *prop,
             unsigned flags);
-
+/**
+* 
+Execute `adb devices`
+Return all devices
+*/
+void adb_devices(struct sc_intr* intr, unsigned flags, char** data, int* num);
 /**
  * Execute `adb get-serialno`
  *

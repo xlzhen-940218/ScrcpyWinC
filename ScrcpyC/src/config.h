@@ -23,7 +23,7 @@
 
 #define HAVE_VASPRINTF
 
-#undef PORTABLE
+#define PORTABLE
 
 #define PREFIX "/usr/local"
 
